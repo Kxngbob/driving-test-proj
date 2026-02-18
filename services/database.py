@@ -10,6 +10,7 @@ class Database:
         self.conn.row_factory = sqlite3.Row
         self.create_tables()
 
+    # ================= TABLES =================
     def create_tables(self):
         cur = self.conn.cursor()
 
@@ -40,6 +41,7 @@ class Database:
 
         self.conn.commit()
 
+    # ================= IMPORT CONTROL =================
     def is_imported(self, anyo, mes):
         cur = self.conn.cursor()
         cur.execute(
@@ -56,24 +58,55 @@ class Database:
         )
         self.conn.commit()
 
-    def get_all_results(self):
-        cur = self.conn.cursor()
-        cur.execute("SELECT * FROM exam_results")
-        return cur.fetchall()
-    
-    def get_filtered_results(self, provincia=None, anyo=None):
-        sql = "SELECT * FROM exam_results WHERE 1=1"
+    # ================= BASE QUERY BUILDER =================
+    def build_where_clause(self, provincia=None, anyo=None):
+        where = " WHERE 1=1 "
         params = []
 
         if provincia:
-            sql += " AND desc_provincia = ?"
+            where += " AND desc_provincia = ? "
             params.append(provincia)
 
         if anyo:
-            sql += " AND anyo = ?"
+            where += " AND anyo = ? "
             params.append(anyo)
+
+        return where, params
+
+    # ================= RAW DATA =================
+    def get_filtered_results(self, provincia=None, anyo=None, limit=100):
+        where, params = self.build_where_clause(provincia, anyo)
+
+        sql = f"""
+        SELECT *
+        FROM exam_results
+        {where}
+        ORDER BY desc_provincia, centro_examen
+        LIMIT ?
+        """
+
+        params.append(limit)
 
         cur = self.conn.cursor()
         cur.execute(sql, params)
         return cur.fetchall()
 
+    # ================= GROUPED DATA FOR CHARTS =================
+    def get_grouped_results(self, provincia=None, anyo=None):
+        where, params = self.build_where_clause(provincia, anyo)
+
+        sql = f"""
+        SELECT
+            desc_provincia,
+            SUM(num_aptos) as total_aptos,
+            SUM(num_no_aptos) as total_no_aptos,
+            SUM(num_aptos + num_no_aptos) as total_presentados
+        FROM exam_results
+        {where}
+        GROUP BY desc_provincia
+        ORDER BY total_aptos DESC
+        """
+
+        cur = self.conn.cursor()
+        cur.execute(sql, params)
+        return cur.fetchall()
