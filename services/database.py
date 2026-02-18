@@ -1,12 +1,40 @@
 import sqlite3
 from pathlib import Path
+from PyQt6.QtCore import QStandardPaths, QCoreApplication
 
-DB_PATH = Path("data/driving_exams.db")
+
+APP_NAME = "DrivingExamsAnalyzer"
+ORG_NAME = "PoppiApps"
+
+
+def get_db_path() -> Path:
+    """
+    Returns a writable application data directory path using QStandardPaths.
+    Ensures clean folder name (not 'python').
+    """
+
+    # Set application + organization name (important!)
+    QCoreApplication.setOrganizationName(ORG_NAME)
+    QCoreApplication.setApplicationName(APP_NAME)
+
+    app_data_dir = Path(
+        QStandardPaths.writableLocation(
+            QStandardPaths.StandardLocation.AppDataLocation
+        )
+    )
+
+    app_data_dir.mkdir(parents=True, exist_ok=True)
+
+    return app_data_dir / "driving_exams.db"
+
 
 class Database:
     def __init__(self):
-        DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-        self.conn = sqlite3.connect(DB_PATH)
+        self.db_path = get_db_path()
+
+        print("DATABASE PATH:", self.db_path)  # Screenshot this for report
+
+        self.conn = sqlite3.connect(self.db_path)
         self.conn.row_factory = sqlite3.Row
         self.create_tables()
 
