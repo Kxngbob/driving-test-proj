@@ -1,0 +1,198 @@
+DRIVING EXAMS STATISTICS APP UT5 – WINDOWS INSTALLER REPORT DGT DATA
+PROJECT
+
+
+
+1.  INTRODUCTION
+
+For Unit 5, the objective was to generate a professional Windows
+installer for one of our applications. I selected the Driving Exams
+Statistics application, which works with official data published by the
+Dirección General de Tráfico (DGT).
+
+The application imports CSV files from DGT, stores the information in a
+SQLite database, allows filtering exam results, generates statistics,
+displays charts, and produces PDF reports.
+
+The goal of this task was to: - Package the application into an
+executable. - Create a Windows installer. - Integrate an application
+icon (.ico). - Ensure the database is created in the correct user
+directory using QStandardPaths. - Demonstrate that the installer works
+correctly.
+
+
+
+2.  TECHNOLOGIES USED
+
+Programming language: Python GUI Framework: PyQt6 Database: SQLite
+Packaging tool: PyInstaller Installer creator: Inno Setup Icon format:
+.ico Operating System: Windows 11
+
+
+
+3.  PREPARATION OF THE APPLICATION
+
+Before creating the installer, I ensured that:
+
+-   The project structure was organized properly.
+-   All imports were correct.
+-   The application worked correctly when executed using: python main.py
+
+I verified: - CSV import worked correctly. - Database tables were
+created automatically. - Filtering and statistics worked. - Charts were
+displayed. - PDF reports were generated without errors.
+
+
+
+4.  IMPLEMENTATION OF QSTANDARDPATHS
+
+To follow good practice, the database must not be stored inside the
+program folder. Instead, it should be stored in the user’s application
+data directory.
+
+I implemented QStandardPaths in the database configuration file:
+
+-   Used QStandardPaths.AppDataLocation.
+-   Created the folder automatically if it did not exist.
+-   Stored the SQLite database file inside that folder.
+
+This ensures: - The database is created per user. - The installer does
+not require administrator privileges. - The application respects Windows
+file structure conventions.
+
+When running the installed version, the database file is automatically
+created inside:
+
+C:
+
+
+
+5.  CREATION OF THE .ICO FILE
+
+To make the installer and executable professional, I created a Windows
+icon file (.ico).
+
+Steps followed:
+
+1.  Obtained a high-resolution PNG image related to DGT.
+2.  Converted it into a multi-resolution .ico file.
+3.  Included sizes:
+    -   16x16
+
+This ensures proper scaling in: - Desktop shortcut - Start menu -
+Taskbar - Windows Explorer
+
+The icon was integrated both in: - The executable (PyInstaller) - The
+installer (Inno Setup configuration)
+
+
+
+6.  GENERATING THE EXECUTABLE (PYINSTALLER)
+
+To convert the Python project into a standalone executable, I used
+PyInstaller.
+
+Command used:
+
+pyinstaller –onefile –windowed –icon=dgt_icon.ico main.py
+
+Explanation:
+
+–onefile Generates a single executable file.
+
+–windowed Prevents the console window from appearing.
+
+–icon Adds the custom DGT icon to the executable.
+
+After execution, the dist/ folder was generated containing: main.exe
+
+I tested the executable independently to confirm: - The application
+launches correctly. - The database is created correctly. - All
+functionality works without Python installed.
+
+
+
+7.  CREATION OF THE WINDOWS INSTALLER (INNO SETUP)
+
+To create the installer (.exe), I used Inno Setup.
+
+Steps followed:
+
+1.  Installed Inno Setup.
+2.  Created a new script using the Script Wizard.
+3.  Configured:
+    -   Application name
+    -   Application version
+    -   Publisher
+    -   Default installation folder
+    -   Output directory
+    -   Icon file
+4.  Added the compiled executable (main.exe) as the main file.
+5.  Configured desktop shortcut creation.
+6.  Added the application icon.
+
+After compiling the script, an installer file was created:
+DrivingExamsSetup.exe
+
+
+
+8.  TESTING THE INSTALLER
+
+I tested the installer on Windows 11.
+
+Tested scenarios:
+
+-   Fresh installation.
+-   Launching from Start Menu.
+-   Launching from Desktop.
+-   Database creation in AppData.
+-   Uninstall process.
+
+Verified:
+
+-   The application installs correctly.
+-   The icon appears correctly.
+-   The database file is created only after first launch.
+-   No errors during installation.
+-   Uninstallation removes program files correctly.
+
+Screenshots were taken of: - Installation wizard. - Desktop shortcut. -
+Start menu entry. - Database folder inside AppData. - Running
+application.
+
+
+
+9.  PROBLEMS ENCOUNTERED
+
+Some issues during development:
+
+-   Missing hidden imports in PyInstaller.
+-   Incorrect file paths before implementing QStandardPaths.
+-   Icon not displaying correctly due to incorrect .ico format.
+-   Antivirus false positive during first build.
+
+All issues were resolved by: - Verifying project structure. - Using
+absolute paths. - Rebuilding the executable. - Generating proper
+multi-resolution .ico files.
+
+
+
+10. CONCLUSION
+
+The Driving Exams Statistics application was successfully packaged into:
+
+-   A standalone executable.
+-   A professional Windows installer.
+
+The project demonstrates:
+
+-   Proper application packaging.
+-   Use of QStandardPaths for user data management.
+-   Integration of custom icons.
+-   Database handling with SQLite.
+-   Professional software distribution practices.
+
+The installer works correctly, creates the necessary folders
+automatically, and follows Windows development standards.
+
+END OF REPORT
