@@ -1,33 +1,43 @@
 from matplotlib.figure import Figure
 
 
-def create_pass_chart(grouped_rows):
+def create_pass_chart(grouped_rows, group_label="Group"):
     """
-    grouped_rows must come from:
-    db.get_grouped_results(...)
+    Creates a stacked bar chart from grouped SQL data.
+
+    Expected columns from database.get_grouped_results():
+    - group_name
+    - total_aptos
+    - total_no_aptos
+    - total_presentados
     """
 
-    provinces = []
-    aptos = []
-    no_aptos = []
+    labels = []
+    passed = []
+    failed = []
 
     for row in grouped_rows:
-        provinces.append(row["desc_provincia"])
-        aptos.append(row["total_aptos"])
-        no_aptos.append(row["total_no_aptos"])
+        labels.append(str(row["group_name"]))
+        passed.append(row["total_aptos"] or 0)
+        failed.append(row["total_no_aptos"] or 0)
 
-    fig = Figure(figsize=(7, 4))
+    fig = Figure(figsize=(8, 4.5))
     ax = fig.add_subplot(111)
 
-    # Stacked bar chart
-    ax.bar(provinces, aptos, label="Aptos")
-    ax.bar(provinces, no_aptos, bottom=aptos, label="No Aptos")
+    if not labels:
+        ax.set_title("No data available for selected filters")
+        ax.set_ylabel("Number of students")
+        fig.tight_layout()
+        return fig
 
-    ax.set_title("Exam Results (Aptos vs No Aptos)")
-    ax.set_ylabel("Number of Students")
+    ax.bar(labels, passed, label="Passed")
+    ax.bar(labels, failed, bottom=passed, label="Failed")
+
+    ax.set_title(f"Exam Results by {group_label}")
+    ax.set_ylabel("Number of students")
     ax.legend()
 
-    ax.tick_params(axis='x', rotation=45)
+    ax.tick_params(axis="x", rotation=45)
 
     fig.tight_layout()
 
